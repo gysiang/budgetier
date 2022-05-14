@@ -1,0 +1,57 @@
+<%- include('partials/user-header'); -%> <br /><br /><br />
+
+<div class="container">
+  <div class="col-4">
+    <p class="name">Hello <%= userData.name %>!</p>
+  </div>
+  <br />
+  <br />
+  <div class="col-md-12 text-center">
+    <a href="/newgroup" class="btn btn-primary btn-lg">CREATE A NEW VACATION</a>
+  </div>
+  <!-- Only show this image if there are no groups for user. -->
+  <% if (group.length <= 0) { %>
+  <div class="col-md-12 text-center">
+    <img src="/images/holiday.png" alt="holiday-maker" />
+  </div>
+  <% } %>
+</div>
+
+<div class="container">
+  <!-- show a list of groups that user is in -->
+  <% for (let i=0; i< groupInfo.length; i++) { %>
+  <br />
+  <div class="card text-center">
+    <div class="card-body">
+      <h5 class="card-title"><%= groupInfo[i].name %></h5>
+      <p class="card-text">
+        <%= moment(groupInfo[i].vacation_date).format ('DD MMM YYYY')%>
+      </p>
+      <p class="card-text"><%= groupInfo[i].days_of_vacation %> days</p>
+      <div class="d-inline-flex flex-row align-items-start">
+        <a href="/dashboard/<%= groupInfo[i].id %>" class="btn btn-primary mr-1"
+          >See More</a
+        >
+        <a
+          href="/dashboard/<%=groupInfo[i].id%>/edit"
+          class="btn btn-primary mr-1"
+          >Edit Vacation</a
+        >
+        <form
+          id="submitButton"
+          action="/dashboard/<%= groupInfo[i].id %>/delete?_method=DELETE"
+          method="POST"
+        >
+          <label>
+            <input class="btn btn-danger" type="submit" value="Delete" />
+          </label>
+        </form>
+      </div>
+    </div>
+    <div class="card-footer text-muted">
+      Allocated Budget $<%= groupInfo[i].budget %>
+    </div>
+    <br />
+    <% }%>
+  </div>
+</div>

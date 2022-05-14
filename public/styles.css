@@ -1,0 +1,13 @@
+h1 {
+  color: white;
+}
+
+.logo-image {
+  width: 64px;
+  height: 64px;
+  overflow: hidden;
+}
+
+.name {
+  font-size: 1.4rem;
+}

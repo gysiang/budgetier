@@ -1,0 +1,44 @@
+<%- include('partials/user-header'); -%>
+
+<div class="container">
+  <br />
+  <h1 class="text-dark text-center"><%= groupInfo[0].group_name %></h1>
+  <br />
+  <div class="col-md-12 text-center">
+    <a
+      href="/dashboard/<%=groupid%>/new-expense/"
+      class="btn btn-primary btn-lg"
+      >ADD A NEW EXPENSE</a
+    >
+    <br />
+    <br />
+    <table class="table table-sm table-dark">
+      <thead>
+        <tr>
+          <th>No.</th>
+          <th>Name</th>
+          <th>Date Added</th>
+          <th>Amount</th>
+          <th>More</th>
+        </tr>
+        <% groupInfo.forEach((expense, i) => { %>
+        <tr>
+          <td><%= i +1 %></td>
+          <td><%= groupInfo[i].name %></td>
+          <td><%= moment(groupInfo[i].date).format("YYYY-MM-DD") %></td>
+          <td>$<%= groupInfo[i].amount %></td>
+          <td>
+            <a
+              href="/dashboard/<%= groupid %>/<%= groupInfo[i].id %>/edit"
+              class="btn btn-info"
+              >Edit</a
+            >
+          </td>
+          <% }) %>
+        </tr>
+      </thead>
+
+      <tbody></tbody>
+    </table>
+  </div>
+</div>

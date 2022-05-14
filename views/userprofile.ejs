@@ -1,0 +1,49 @@
+<%- include('partials/user-header'); -%> <br /><br /><br />
+
+<div class="container">
+  <div
+    class="col-12 my-5 d-flex align-items-center justify-content-center flex-column text-white"
+  >
+    <h1>Admin Dashboard:</h1>
+    <div class="bg-secondary p-3 rounded">
+      <form
+        action="/user-profile/<%= userData.id %>/edit?_method=PUT"
+        method="POST"
+      >
+        <label for="name">Name:</label><br />
+        <input
+          type="text"
+          id="name"
+          name="name"
+          size="50"
+          class="form-control"
+          value="<%= userData.name %>"
+        />
+        <br />
+        <label for="email">Email:</label><br />
+        <input
+          type="text"
+          id="email"
+          name="email"
+          class="form-control"
+          size="50"
+          value="<%= userData.email %>"
+          required
+        /><br />
+        <label for="password">Password:</label><br />
+        <input
+          type="password"
+          id="password"
+          name="password"
+          class="form-control"
+          size="50"
+          value=""
+          required
+        /><br />
+        <div class="text-center">
+          <input class="btn btn-primary btn-lg" type="submit" value="Save" />
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
