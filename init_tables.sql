@@ -17,7 +17,6 @@ INSERT INTO user_group (user_id,group_id) VALUES (1,2);
 
 ALTER TABLE expense RENAME COLUMN note_id to note;
 
-
 SELECT vacation_date, days_of_vacation
 FROM "group"
 WHERE group_id = ${req.params.groupID}
@@ -30,5 +29,7 @@ WHERE expense.group_id = ${req.params.groupID}
 AND date = ($1 + i)
 
 run a loop
+
+dateArray.push(moment(vacation_date,DD-MM-YY).moment(i,'days'))
 
 

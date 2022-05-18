@@ -1,56 +1,63 @@
-<%- include('partials/user-header'); -%>
-<div class="container">
-  <div
-    class="col-12 my-5 d-flex align-items-center justify-content-center flex-column text-white"
-  >
-    <h1 class="text-dark">
-      Add A New Expense for <%= groupInfo[0].group_name %>
-    </h1>
-    <br />
-    <div class="bg-secondary p-3 rounded">
-      <form action="/dashboard/<%=groupid%>/new-expense/" method="POST">
-        <label for="name">Name :</label>
-        <input
-          type="text"
-          id="name"
-          name="name"
-          size="50"
-          class="form-control"
-          required
-        /><br />
-        <label for="date">Date of Expense:</label>
-        <input
-          type="date"
-          id="date"
-          name="date"
-          size="50"
-          class="form-control"
-          required
-        /><br />
-        <label for="note">Comments:</label><br />
-        <input
-          type="text"
-          id="note"
-          name="note"
-          size="50"
-          class="form-control text-dark"
-        /><br />
-        <label for="amount">Enter Amount</label>
-        <input
-          type="text"
-          name="amount"
-          id="amount"
-          pattern="^\d{1,3}(,\d{3})*(\.\d+)?$"
-          value=""
-          data-type="currency"
-          placeholder="$1000.00"
-        />
-        <input
-          type="submit"
-          value="Submit"
-          class="btn btn-primary text-center btn-lg"
-        />
-      </form>
+<!DOCTYPE html>
+<html>
+  <%- include('partials/head'); -%> <%- include('partials/navbar'); -%>
+  <div class="container">
+    <div
+      class="col-12 my-5 d-flex align-items-center justify-content-center flex-column text-white"
+    >
+      <h3 class="text-dark text-center">
+        Add A New Expense for <%= groupInfo[0].name %><br />
+        <%= moment(groupInfo[0].vacation_date).format("DD MMM YY") %>, <%=
+        groupInfo[0].days_of_vacation %> Days
+      </h3>
+      <br />
+      <div class="bg-secondary p-3 rounded">
+        <form action="/dashboard/<%=groupid%>/new-expense/" method="POST">
+          <label for="name">Name :</label>
+          <input
+            type="text"
+            id="name"
+            name="name"
+            size="50"
+            class="form-control"
+            required
+          /><br />
+          <label for="date">Date of Expense:</label>
+          <input
+            type="date"
+            id="date"
+            name="date"
+            size="50"
+            class="form-control"
+            required
+          /><br />
+          <label for="note">Comments:</label><br />
+          <input
+            type="text"
+            id="note"
+            name="note"
+            size="50"
+            class="form-control text-dark"
+          /><br />
+          <label for="amount">Enter Amount</label>
+          <input
+            type="text"
+            name="amount"
+            id="amount"
+            size="50"
+            class="form-control"
+            pattern="^\d{1,3}(,\d{3})*(\.\d+)?$"
+            value=""
+            data-type="currency"
+            placeholder="$1000.00"
+          />
+          <input
+            type="submit"
+            value="Submit"
+            class="btn btn-primary text-center btn-lg"
+          />
+        </form>
+      </div>
     </div>
   </div>
-</div>
+</html>

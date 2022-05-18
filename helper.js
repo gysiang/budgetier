@@ -1,5 +1,6 @@
 import jsSHA from 'jssha';
 const SALT = 'Milk is delicious';
+import moment from 'moment';
 
 
 /**
@@ -24,9 +25,9 @@ export const getHash = (input) => {
  * @param {*} res - response as sent by server
  * @param {func} next - next function to execute
  */
-export const loginCheck = (req, res, next) => {
+const loginCheck = (req, res, next) => {
   if (!req.cookies.loggedInHash) {
-    res.redirect('login', { message: 'Please log in to continue.' });
+    res.redirect('/login', { message: 'Please log in to continue.' });
   }
   // set the default value
   req.isUserLoggedIn = false;
@@ -38,3 +39,20 @@ export const loginCheck = (req, res, next) => {
     }
   next();
 };
+
+export const getDateLabel = (vacation_date, days) => {
+let dateArray = [];
+for (let i=0; i<days; i+=1){
+  dateArray.push(moment(vacation_date).add(i, 'days').format("DD MMM YY"))
+  }
+  return dateArray;
+} 
+
+export const getExpenseDate = (vacation_date, days) => {
+let dateArray = [];
+for (let i=0; i<days; i+=1){
+  dateArray.push([moment(vacation_date).add(i, 'days').format("YYYY-MM-DD")])
+  }
+  return dateArray;
+} 
+

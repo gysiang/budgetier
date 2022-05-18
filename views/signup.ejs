@@ -1,44 +1,52 @@
-<%- include('partials/header'); -%> <br /><br /><br />
+<!DOCTYPE html>
+<html>
+  <%- include('partials/head'); -%> <%- include('partials/navbar-nologin');
+  -%><br /><br /><br />
 
-<div class="container">
-  <div
-    class="col-12 d-flex align-items-center justify-content-center flex-column text-white"
-  >
-    <h1 class="text-dark">Sign Up!</h1>
-    <br />
-    <div class="bg-secondary p-3 rounded">
-      <form action="/signup" method="POST">
-        <label for="name">Name:</label><br />
-        <input
-          type="text"
-          id="name"
-          name="name"
-          class="form-control"
-          size="40"
-          required
-        /><br />
-        <label for="email">Email:</label><br />
-        <input
-          type="text"
-          id="email"
-          name="email"
-          class="form-control"
-          size="40"
-          required
-        /><br />
-        <label for="password">Password:</label><br />
-        <input
-          type="password"
-          id="password"
-          name="password"
-          class="form-control"
-          size="40"
-          required
-        /><br />
-        <div class="text-center">
-          <input class="btn btn-primary btn-lg" type="submit" value="Submit" />
-        </div>
-      </form>
+  <div class="container">
+    <div
+      class="col-12 d-flex align-items-center justify-content-center flex-column text-white"
+    >
+      <h1 class="text-dark">Sign Up!</h1>
+      <br />
+      <div class="bg-secondary p-3 rounded">
+        <form action="/signup" method="POST">
+          <label for="name">Name:</label><br />
+          <input
+            type="text"
+            id="name"
+            name="name"
+            class="form-control"
+            size="40"
+            required
+          /><br />
+          <label for="email">Email:</label><br />
+          <input
+            type="text"
+            id="email"
+            name="email"
+            class="form-control"
+            size="40"
+            required
+          /><br />
+          <label for="password">Password:</label><br />
+          <input
+            type="password"
+            id="password"
+            name="password"
+            class="form-control"
+            size="40"
+            required
+          /><br />
+          <div class="text-center">
+            <input
+              class="btn btn-primary btn-lg"
+              type="submit"
+              value="Submit"
+            />
+          </div>
+        </form>
+      </div>
     </div>
   </div>
-</div>
+</html>

@@ -11,3 +11,11 @@ h1 {
 .name {
   font-size: 1.4rem;
 }
+
+#expenseChart {
+  display: none;
+}
+
+.cyan {
+  background-color: $cyan-200;
+}

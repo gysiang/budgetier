@@ -1,44 +1,90 @@
-<%- include('partials/user-header'); -%>
+<!DOCTYPE html>
+<html>
+  <%- include('partials/head'); -%> <%- include('partials/navbar'); -%>
 
-<div class="container">
-  <br />
-  <h1 class="text-dark text-center"><%= groupInfo[0].group_name %></h1>
-  <br />
-  <div class="col-md-12 text-center">
-    <a
-      href="/dashboard/<%=groupid%>/new-expense/"
-      class="btn btn-primary btn-lg"
-      >ADD A NEW EXPENSE</a
-    >
-    <br />
-    <br />
-    <table class="table table-sm table-dark">
-      <thead>
-        <tr>
-          <th>No.</th>
-          <th>Name</th>
-          <th>Date Added</th>
-          <th>Amount</th>
-          <th>More</th>
-        </tr>
-        <% groupInfo.forEach((expense, i) => { %>
-        <tr>
-          <td><%= i +1 %></td>
-          <td><%= groupInfo[i].name %></td>
-          <td><%= moment(groupInfo[i].date).format("YYYY-MM-DD") %></td>
-          <td>$<%= groupInfo[i].amount %></td>
-          <td>
-            <a
-              href="/dashboard/<%= groupid %>/<%= groupInfo[i].id %>/edit"
-              class="btn btn-info"
-              >Edit</a
-            >
-          </td>
-          <% }) %>
-        </tr>
-      </thead>
+  <div id ="expenseChart" class="container-md">
+  <br/>
+  <br/>
+    <canvas id="myChart"></canvas>
+   </div>
 
-      <tbody></tbody>
-    </table>
+   <script>
+  let myChart = document.getElementById("myChart");
+
+    let monthChart = new Chart(myChart, {
+      type: "bar",
+      data: {
+        labels: <%-label %>,
+        datasets: [
+          {
+            label: "Amount Spent Per Day",
+            backgroundColor: ["red", "blue", "green", "blue", "red", "blue"],
+            borderColor: "rgb(255, 99, 132)",
+            data: [<%=expense %>],
+          },
+        ],
+      },
+      options: {
+            y: {
+            max: 1000,
+            ticks: {
+                stepSize: 100
+            }
+      },
+    }
+  });
+</script>
+
+  <div class="container">
+    <br />
+    <div style="text-align: center;">
+    <br />
+    <h1 class="text-dark text-center"><%= groupInfo[0].group_name %></h1>
+    <br />
+    <div class="d-grid col-6 mx-auto">
+      <a
+        href="/dashboard/<%=groupid%>/new-expense/"
+        class="btn btn-primary btn-lg"
+        >Add A New Expense</a
+      >
+      <br/><br/>
+      <button type="button" class="btn btn-primary btn-lg" onclick="showChart()">Show Me A Chart</button>
+      <script>
+      const showChart = () => {
+      var x = document.getElementById("expenseChart");
+      if (x.style.display === "none") {
+      x.style.display = "block";
+      } else {x.style.display = "none";}
+      }
+      </script>
+      </div>
+      <br />
+      <table class="table table-sm table-dark">
+        <thead>
+          <tr>
+            <th>No.</th>
+            <th>Name</th>
+            <th>Date</th>
+            <th>Amount</th>
+            <th>More</th>
+          </tr>
+          <% groupInfo.forEach((expense, i) => { %>
+          <tr>
+            <td><%= i +1 %></td>
+            <td><%= groupInfo[i].name %></td>
+            <td><%= moment(groupInfo[i].date).format("DD/MM/YY") %></td>
+            <td>$<%= groupInfo[i].amount %></td>
+            <td>
+              <a
+                href="/dashboard/<%= groupid %>/<%= groupInfo[i].id %>/edit"
+                class="btn btn-info"
+                >Edit</a
+              >
+            </td>
+            <% }) %>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
   </div>
-</div>
+</html>

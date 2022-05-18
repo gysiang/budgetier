@@ -5,7 +5,7 @@ import cookieParser from 'cookie-parser';
 import moment from 'moment';
 const SALT = 'Milk is delicious';
  
-import { getHash , loginCheck} from './helper.js'
+import { getHash , getDateLabel, getExpenseDate, } from './helper.js'
 
 const app = express();
 
@@ -28,6 +28,28 @@ const pgConnectionConfigs = {
 
 const pool = new Pool(pgConnectionConfigs);
 
+
+/**
+ * checks and sets login status to restrict certain routes to unly be usable by logged-in users
+ * compares the existing hash cookie to a resh hash of the raw userId cookie to verify that no changes were made by the user
+ * @param {*} req - request as sent by client
+ * @param {*} res - response as sent by server
+ * @param {func} next - next function to execute
+ */
+const loginCheck = (req, res, next) => {
+  if (!req.cookies.loggedInHash) {
+    res.redirect('/login', { message: 'Please log in to continue.' });
+  }
+  // set the default value
+  req.isUserLoggedIn = false;
+
+  // check to see if the cookies you need exists
+  if (req.cookies.userID) {
+      req.isUserLoggedIn = true;
+      app.locals.userID = req.cookies.userID;
+    }
+  next();
+};
 
 app.get('/', (request, response) => {
   response.render('index');
@@ -136,7 +158,7 @@ app.put('/user-profile', (req, res) => {
     })
   });
 
-app.get('/dashboard', (req,res) => {
+app.get('/dashboard', loginCheck, (req,res) => {
   const userValue = [req.cookies.userID];
   let data = {};
   let groupArray = [];
@@ -163,7 +185,7 @@ app.get('/dashboard', (req,res) => {
     for (let i=0; i<data.group.length; i+=1){
       groupArray.push([data.group[i]['group_id']])
     }
-
+    console.log(groupArray)
     const getGroupData = async (group) => {
       return await pool.query('SELECT * from "group" WHERE id = $1',group)
     }
@@ -183,11 +205,11 @@ app.get('/dashboard', (req,res) => {
   });
 })
 
-app.get('/newgroup', (req, res) => {
+app.get('/newgroup', loginCheck, (req, res) => {
   res.render('new-group')
 });
 
-app.post('/newgroup', (req, res) => {
+app.post('/newgroup', loginCheck, (req, res) => {
   const userValue = Number([req.cookies.userID]);
   console.log(req.body)
 
@@ -213,7 +235,7 @@ app.post('/newgroup', (req, res) => {
     })
   });
 
-app.get('/dashboard/:groupid/edit', (req, res) => {
+app.get('/dashboard/:groupid/edit',loginCheck, (req, res) => {
 
   const editgroupquery = 'SELECT * FROM "group" WHERE id = $1';
 
@@ -223,13 +245,12 @@ app.get('/dashboard/:groupid/edit', (req, res) => {
     let data = {
           groupInfo : result.rows,
           moment: moment,
-        };
-    console.log(moment(data.groupInfo[0].vacation_date).format("YYYY-MM-DD"))    
+        };  
     res.render('edit-group', data);
   })
 });
 
-app.put('/dashboard/:groupid/edit', (req, res) => {
+app.put('/dashboard/:groupid/edit',loginCheck, (req, res) => {
   const { groupid } = req.params;
   const { name, date, vacation_days, budget} = req.body;
 
@@ -248,15 +269,17 @@ app.put('/dashboard/:groupid/edit', (req, res) => {
   })
 });
 
-app.delete('/dashboard/:groupid/delete', (req, res) => {
-  console.log(req.params)
+app.delete('/dashboard/:groupid/delete',loginCheck, (req, res) => {
   console.log('incoming delete request')
   const deleteID = [req.params.groupid];
-  const deleteQuery = `DELETE FROM "group" WHERE id= $1`;
-  pool
-    .query(deleteQuery, deleteID)
-    .then((result) => {
-      pool.query('DELETE FROM user_group WHERE group_id = $1',deleteID)
+  
+  const result = Promise.all([
+    pool.query(`DELETE FROM "group" WHERE id= $1`,deleteID),
+    pool.query('DELETE FROM user_group WHERE group_id = $1',deleteID),
+    pool.query('DELETE FROM expenses WHERE group_id = $1',deleteID)
+  ])
+  
+    result.then((result)=> {
       res.redirect('/dashboard')
     })
     .catch((error) => {
@@ -265,10 +288,10 @@ app.delete('/dashboard/:groupid/delete', (req, res) => {
       })
   });
 
-app.get('/dashboard/:groupid', (req, res) => {
+app.get('/dashboard/:groupid',loginCheck, (req, res) => {
   const { groupid } = req.params;
 
-  const viewgroupQuery = 'SELECT expense.id,expense.name, "group".name AS group_name, user_id, date, amount, note from expense INNER JOIN "group" ON group_id = "group".id WHERE group_id= $1';
+  const viewgroupQuery = 'SELECT expense.id,expense.name, "group".name AS group_name, user_id, "group".vacation_date AS group_date,"group".days_of_vacation AS days, date, "group".budget AS group_budget, amount, note from expense INNER JOIN "group" ON group_id = "group".id WHERE group_id= $1';
 
   pool
     .query(viewgroupQuery,[groupid])
@@ -276,10 +299,39 @@ app.get('/dashboard/:groupid', (req, res) => {
       let data = {
         groupInfo: result.rows,
         moment: moment,
-        groupid:groupid
+        groupid:groupid,
+        label: [],
+        expense: []
       }
-      console.log(data);
-      res.render('view-group', data)
+  
+      const dateLabel = JSON.stringify(getDateLabel(data.groupInfo[0].group_date, data.groupInfo[0].days))
+      data['label'] = dateLabel;
+      const querydateArray = getExpenseDate(data.groupInfo[0].group_date, data.groupInfo[0].days)
+    
+      // console.log(querydateArray)
+      const getExpensebyDay = async (array) => {
+        return await pool.query('SELECT amount from expense WHERE date = $1',array)
+    }
+
+    const expensebyDayResult = async (querydateArray) => {
+      const dailyexpense = [];
+      let dailysum=0;
+      const results = await Promise.all(querydateArray.map(async (querydateArray) => getExpensebyDay(querydateArray)))
+      for (let i=0; i<querydateArray.length; i+=1){
+      if (!results[i].rows.length){
+        data['expense'].push(Number(0));
+      } else {
+       results[i]['rows'].forEach(element =>{
+         dailyexpense.push(Number(element.amount))
+       })
+      dailysum = dailyexpense.reduce((pv, cv) => pv + cv, 0);
+      data['expense'].push(dailysum);
+      } 
+    } 
+    console.log(data)
+    res.render('view-group', data)
+  }
+      expensebyDayResult(querydateArray);
     })
       .catch((error) => {
         console.log('ERROR CAUGHT');
@@ -287,10 +339,10 @@ app.get('/dashboard/:groupid', (req, res) => {
     })
   })
 
-app.get('/dashboard/:groupid/new-expense/', (req, res) => {
+app.get('/dashboard/:groupid/new-expense/',loginCheck, (req, res) => {
   const { groupid } = req.params;
 
-  const getGroupNameQuery = 'SELECT name from "group" WHERE id=$1'
+  const getGroupNameQuery = 'SELECT name, vacation_date, days_of_vacation from "group" WHERE id=$1'
   const getGroupNameValue = [groupid]
 
   pool.
@@ -298,7 +350,8 @@ app.get('/dashboard/:groupid/new-expense/', (req, res) => {
     .then((result) => {
       let data = {
         groupInfo: result.rows,
-        groupid: groupid
+        groupid: groupid,
+        moment:moment
       }
     console.log(data)
     res.render('new-expense', data)
@@ -307,17 +360,18 @@ app.get('/dashboard/:groupid/new-expense/', (req, res) => {
 
 
 // create a new expense inside a group - post route
-app.post('/dashboard/:groupid/new-expense/', (req, res) => {
+app.post('/dashboard/:groupid/new-expense/',loginCheck, (req, res) => {
   const { groupid } = req.params;
-  const userID = Number(req.cookies.userID);
-
+  const { userID } = app.locals.userID;
+  console.log(userID)
   const { name, date, amount, note} = req.body;
 
   const insertExpenseQuery = 'INSERT INTO expense (name, user_id, note, group_id, date, amount) VALUES ($1, $2, $3, $4, $5, $6)';
 
   const getExpenseValue = [name, userID, note, groupid, date, amount]
+  console.log(getExpenseValue)
   pool.query(insertExpenseQuery,getExpenseValue);
-  res.redirect(`/dashboard/'${groupid}'`)
+  res.redirect(`/dashboard/${groupid}`)
 
   .catch((error) => {
         console.log('INSERT ERROR CAUGHT');
@@ -326,7 +380,7 @@ app.post('/dashboard/:groupid/new-expense/', (req, res) => {
 })
 
 // edit individual expense inside a group
-app.get('/dashboard/:groupid/:expenseid/edit', (req, res) => {
+app.get('/dashboard/:groupid/:expenseid/edit',loginCheck, (req, res) => {
   const { groupid, expenseid } = req.params;
   
   const sqlQuery = 'SELECT * from expense WHERE group_id=$1 AND expense.id=$2';
@@ -349,7 +403,7 @@ app.get('/dashboard/:groupid/:expenseid/edit', (req, res) => {
 })
 
 // update individual expense inside a group
-app.put('/dashboard/:groupid/:expenseid/edit', (req, res) => {
+app.put('/dashboard/:groupid/:expenseid/edit',loginCheck, (req, res) => {
   const { groupid, expenseid } = req.params;
   const { name, date, amount, note} = req.body;
 
@@ -368,22 +422,23 @@ app.put('/dashboard/:groupid/:expenseid/edit', (req, res) => {
     })
   });
 
+  // delete individual expense inside a group
+app.delete('/dashboard/:groupid/:expenseid/delete',loginCheck, (req, res) => {
+  const { groupid, expenseid } = req.params;
 
-//create a function to get the days //
+  const deleteExpenseValues = [expenseid,groupid];
 
-// 1. pool.query('SELECT * from "group" where id=1)
-// 2. obtain vacation day and days of vacation from this
-// 3. get an array of all the dates of the vacation,
-// eg. for (let i=0; i< days_of_vacation){
-//  dateArray.push(moment(vacation_date,DD-MM-YYYY).add(i,'days')
-//}
+  const deleteSQLQUERY = 'DELETE FROM expense WHERE id = $1 AND group_id = $2'
 
-
-//create a function to get the total amount spend for each day for each group//
-
-//1. pool.query('SELECT * from expense WHERE group_id =$1 AND date = $2)
-//2. do a async and promise.all to run all the promises at the same time and return one array with all the amounts from the different dates
-
-
+  pool
+    .query(deleteSQLQUERY, deleteExpenseValues)
+    .then(() => {
+      res.redirect(`/dashboard/${groupid}`);
+    })  
+    .catch((error) => {
+    console.log('ERROR CAUGHT')
+    console.log(error.message);
+    })
+  });
 
 app.listen(PORT, ()=> console.log(`app is running at PORT ${PORT}...`));
