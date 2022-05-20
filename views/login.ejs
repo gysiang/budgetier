@@ -1,8 +1,10 @@
 <!DOCTYPE html>
 <html>
   <%- include('partials/head'); -%> <%- include('partials/navbar-nologin');
-  -%><br /><br /><br />
-
+  -%><br />
+  <%- if (message === true) {%>
+  <h3 class="sans-bold">Wrong Email or Password. Please try again.</h3>
+  <%- } %>
   <div class="container">
     <div
       class="col-12 d-flex align-items-center justify-content-center flex-column text-white"

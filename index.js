@@ -110,6 +110,7 @@ app.post('/login', (req, res) => {
   })
   .catch((error) => {
     console.log('Error executing query', error.stack);
+    res.render('error', { message: 'Wrong Email or Password. Please try again.'});
     return
   })
 });
