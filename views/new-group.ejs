@@ -1,60 +1,65 @@
 <!DOCTYPE html>
 <html>
   <%- include('partials/head'); -%> <%- include('partials/navbar'); -%>
-  <div class="container">
-    <div
-      class="col-12 my-5 d-flex align-items-center justify-content-center flex-column text-white"
-    >
-      <h2 class="text-dark text-center">Create A New Vacation!</h2>
-      <br />
-      <div class="bg-secondary p-3 rounded">
-        <form action="/newgroup" method="POST">
-          <label for="Item">Name of Vacation :</label>
-          <input
-            type="text"
-            id="name"
-            name="name"
-            size="50"
-            class="form-control"
-            required
-          /><br />
-          <label for="date">Date of Vacation:</label>
-          <input
-            type="date"
-            id="date"
-            name="date"
-            size="50"
-            class="form-control"
-            required
-          /><br />
-          <label for="days">Days of Vacation:</label>
-          <select class="form-control" name="days" id="days">
-            <% for (let i=1; i<=30; i+=1) { %>
-            <option value="<%=`${i}`%>"><%= `${i}` %> Days</option>
-            <% } %>
-          </select>
+  <body class="bg-color">
+    <div class="container">
+      <div
+        class="col-12 my-5 d-flex align-items-center justify-content-center flex-column"
+      >
+        <div class="bg-white p-3 pb-3 rounded">
+          <h2 class="text-dark text-center sans-bold">
+            Create A New Vacation!
+          </h2>
           <br />
-          <label for="budget">Enter Budget</label>
-          <br />
-          <input
-            type="text"
-            name="budget"
-            id="budget"
-            size="50"
-            class="form-control"
-            pattern="^\d{1,3}(,\d{3})*(\.\d+)?$"
-            value=""
-            data-type="currency"
-            placeholder="$1000.00"
-          />
-          <br />
-          <input
-            type="submit"
-            value="Submit"
-            class="btn btn-primary text-center btn-lg"
-          />
-        </form>
+          <form action="/newgroup" method="POST">
+            <label for="Item">Name of Vacation :</label>
+            <input
+              type="text"
+              id="name"
+              name="name"
+              size="50"
+              class="form-control text-dark"
+              required
+            /><br />
+            <label for="date">Date of Vacation:</label>
+            <input
+              type="date"
+              id="date"
+              name="date"
+              size="50"
+              class="form-control text-dark"
+              required
+            /><br />
+            <label for="days">Days of Vacation:</label>
+            <select class="form-control text-dark" name="days" id="days">
+              <% for (let i=1; i<=30; i+=1) { %>
+              <option value="<%=`${i}`%>"><%= `${i}` %> Days</option>
+              <% } %>
+            </select>
+            <br />
+            <label for="budget">Enter Budget</label>
+            <br />
+            <input
+              type="text"
+              name="budget"
+              id="budget"
+              size="50"
+              class="form-control text-dark"
+              pattern="^\d{1,3}(,\d{3})*(\.\d+)?$"
+              value=""
+              data-type="currency"
+              placeholder="$1000.00"
+            />
+            <br />
+            <input
+              type="submit"
+              value="Submit"
+              class="btn btn-primary text-center btn-lg rounded-0"
+            />
+          </form>
+        </div>
       </div>
     </div>
-  </div>
+    <%- include('partials/dashboard-footer'); -%>
+  </body>
 </html>

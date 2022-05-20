@@ -1,75 +1,77 @@
 <!DOCTYPE html>
 <html>
   <%- include('partials/head'); -%> <%- include('partials/navbar'); -%>
-  <br />
-
-  <div class="container">
-    <div
-      class="col-12 my-5 d-flex align-items-center justify-content-center flex-column text-white"
-    >
-      <h1 class="text-dark">Edit Your Expense!</h1>
-      <br />
-      <div class="bg-secondary p-3 rounded">
-        <form
-          action="/dashboard/<%= expenseInfo.group_id %>/<%= expenseInfo.id %>/edit?_method=PUT"
-          method="POST"
-        >
-          <label for="name">Name :</label>
-          <input
-            type="text"
-            id="name"
-            name="name"
-            size="50"
-            value="<%= expenseInfo.name %>"
-            class="form-control"
-            required
-          /><br />
-          <label for="date">Date of Expense:</label>
-          <input type="date" id="date" name="date" size="50"
-          value="<%=moment(expenseInfo.date).format("YYYY-MM-DD")%>"
-          class="form-control" required /><br />
-          <label for="note">Comments:</label><br />
-          <input
-            type="text"
-            id="note"
-            name="note"
-            size="50"
-            value="<%= expenseInfo.note  %>"
-            class="form-control text-dark"
-          /><br />
-          <label for="amount">Enter Amount</label>
-          <input
-            type="text"
-            name="amount"
-            id="amount"
-            size="50"
-            class="form-control"
-            pattern="^\d{1,3}(,\d{3})*(\.\d+)?$"
-            value="<%= expenseInfo.amount %>"
-            data-type="currency"
-            placeholder="$1000.00"
-          />
-          <br />
-          <input
-            type="submit"
-            value="Submit"
-            class="btn btn-primary text-center btn-lg"
-          />
-        </form>
+  <body class="bg-color">
+    <div class="container">
+      <div
+        class="col-12 my-5 d-flex align-items-center justify-content-center flex-column"
+      >
+        <div class="bg-white p-3 rounded">
+          <h2 class="text-dark text-center sans-bold">Edit Your Expense!</h1>
         <br />
-        <form
-          action="/dashboard/<%= expenseInfo.group_id %>/<%= expenseInfo.id %>/delete?_method=DELETE"
-          method="POST"
-        >
-          <label>
+          <form
+            action="/dashboard/<%= expenseInfo.group_id %>/<%= expenseInfo.id %>/edit?_method=PUT"
+            method="POST"
+          >
+            <label for="name">Name :</label>
             <input
-              class="btn btn-danger text-center btn-lg"
-              type="submit"
-              value="Delete"
+              type="text"
+              id="name"
+              name="name"
+              size="50"
+              value="<%= expenseInfo.name %>"
+              class="form-control text-dark"
+              required
+            /><br />
+            <label for="date">Date of Expense:</label>
+            <input type="date" id="date" name="date" size="50"
+            value="<%=moment(expenseInfo.date).format("YYYY-MM-DD")%>"
+            class="form-control text-dark" required /><br />
+            <label for="note">Comments:</label><br />
+            <input
+              type="text"
+              id="note"
+              name="note"
+              size="50"
+              value="<%= expenseInfo.note  %>"
+              class="form-control text-dark"
+            /><br />
+            <label for="amount">Enter Amount</label>
+            <input
+              type="text"
+              name="amount"
+              id="amount"
+              size="50"
+              class="form-control text-dark"
+              pattern="^\d{1,3}(,\d{3})*(\.\d+)?$"
+              value="<%= expenseInfo.amount %>"
+              data-type="currency"
+              placeholder="$1000.00"
             />
-          </label>
-        </form>
+            <br />
+          <div class="d-flex flex-column">
+            <input
+              type="submit"
+              value="Submit"
+              class="btn btn-primary text-center btn-lg rounded-0"
+            />
+          </form>
+          <br/>
+          <form
+            action="/dashboard/<%= expenseInfo.group_id %>/<%= expenseInfo.id %>/delete?_method=DELETE"
+            method="POST"
+          >
+            <label>
+              <input
+                class="btn btn-danger text-center btn-xl btn-lg rounded-0"
+                type="submit"
+                value="Delete"
+              />
+            </label>
+          </form>
+          </div>
+          </div>
       </div>
-    </div>
-  </div>
+  <%- include('partials/dashboard-footer'); -%> 
+  </body>
 </html>

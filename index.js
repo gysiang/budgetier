@@ -315,18 +315,21 @@ app.get('/dashboard/:groupid',loginCheck, (req, res) => {
 
     const expensebyDayResult = async (querydateArray) => {
       const dailyexpense = [];
-      let dailysum=0;
       const results = await Promise.all(querydateArray.map(async (querydateArray) => getExpensebyDay(querydateArray)))
       for (let i=0; i<querydateArray.length; i+=1){
+      let dailysum=0;
+      // console.log(dailysum)
       if (!results[i].rows.length){
         data['expense'].push(Number(0));
       } else {
+      // console.log(results[i]['rows'])
        results[i]['rows'].forEach(element =>{
-         dailyexpense.push(Number(element.amount))
+         dailysum += (Number(element.amount))
+         console.log(dailysum)
        })
-      dailysum = dailyexpense.reduce((pv, cv) => pv + cv, 0);
       data['expense'].push(dailysum);
-      } 
+      }
+      dailysum=0;
     } 
     console.log(data)
     res.render('view-group', data)
@@ -376,6 +379,54 @@ app.post('/dashboard/:groupid/new-expense/',loginCheck, (req, res) => {
   .catch((error) => {
         console.log('INSERT ERROR CAUGHT');
         console.error(error.message);
+  })
+})
+
+// get route to add new users
+app.get('/dashboard/:groupid/add-user/',loginCheck, (req, res) => {
+  const { groupid } = req.params;
+
+  const getGroupNameQuery = 'SELECT name, vacation_date, days_of_vacation from "group" WHERE id=$1'
+  const getGroupNameValue = [groupid]
+
+  const getUserEmailQuery = 'SELECT email from "user"'
+
+  const result = Promise.all([
+    pool.query(getGroupNameQuery,getGroupNameValue),
+    pool.query(getUserEmailQuery)
+  ])
+  
+   result.then((results)=> {
+    const [getGroupNameResults, getUserEmailResults] = results;
+  
+    const data = {
+      email: getUserEmailResults.rows,
+      groupInfo: getGroupNameResults.rows,
+      moment: moment,
+      groupid: groupid,
+    };
+    console.log(data)
+    res.render('add-user', data)
+   })
+})
+
+// post route to add new users
+app.post('/dashboard/:groupid/add-user/',loginCheck, (req, res) => {
+  const { groupid } = req.params;
+  const { email } = req.body;
+
+  const userQuery = 'SELECT "user".id FROM "user" WHERE email=$1';
+  const emailValue = [email]
+  pool
+  .query(userQuery,emailValue)
+  .then((result)=>{
+    const insertValue = [result.rows[0].id,groupid]
+    pool.query('INSERT INTO user_group (user_id,group_id) VALUES ($1,$2)',insertValue)
+    res.redirect(`/dashboard/${groupid}`)
+  })
+  .catch((error) => {
+      console.log('INSERT ERROR CAUGHT');
+      console.error(error.message);
   })
 })
 

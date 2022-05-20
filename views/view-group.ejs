@@ -2,10 +2,11 @@
 <html>
   <%- include('partials/head'); -%> <%- include('partials/navbar'); -%>
 
+<body class="bg-color">
   <div id ="expenseChart" class="container-md">
   <br/>
-  <br/>
-    <canvas id="myChart"></canvas>
+
+    <canvas class="bg-white p-2 rounded shadow" id="myChart"></canvas>
    </div>
 
    <script>
@@ -36,31 +37,12 @@
 </script>
 
   <div class="container">
+    <div class="col-md-12">
     <br />
-    <div style="text-align: center;">
+    <h2 class="text-dark text-center sans-bold"><%= groupInfo[0].group_name %></h2>
     <br />
-    <h1 class="text-dark text-center"><%= groupInfo[0].group_name %></h1>
-    <br />
-    <div class="d-grid col-6 mx-auto">
-      <a
-        href="/dashboard/<%=groupid%>/new-expense/"
-        class="btn btn-primary btn-lg"
-        >Add A New Expense</a
-      >
-      <br/><br/>
-      <button type="button" class="btn btn-primary btn-lg" onclick="showChart()">Show Me A Chart</button>
-      <script>
-      const showChart = () => {
-      var x = document.getElementById("expenseChart");
-      if (x.style.display === "none") {
-      x.style.display = "block";
-      } else {x.style.display = "none";}
-      }
-      </script>
-      </div>
-      <br />
-      <table class="table table-sm table-dark">
-        <thead>
+      <table class="table table-sm table-hover table-light">
+        <thead class="thead-dark">
           <tr>
             <th>No.</th>
             <th>Name</th>
@@ -68,6 +50,8 @@
             <th>Amount</th>
             <th>More</th>
           </tr>
+          </thead>
+          <tbody>
           <% groupInfo.forEach((expense, i) => { %>
           <tr>
             <td><%= i +1 %></td>
@@ -83,8 +67,9 @@
             </td>
             <% }) %>
           </tr>
-        </thead>
-        <tbody></tbody>
+        </tbody>
       </table>
   </div>
+  <%- include('partials/group-footer'); -%> 
+</body>
 </html>
