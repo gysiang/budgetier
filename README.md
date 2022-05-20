@@ -1,7 +1,5 @@
 # Budgetier
 
-![budgetier logo](./public/images/logo_transparent.png =50x50)
-
 A expenses tracking app for the budget conscious travellers.
 
 ## Why I created this app
