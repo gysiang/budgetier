@@ -1,6 +1,8 @@
 import jsSHA from 'jssha';
 const SALT = 'Milk is delicious';
 import moment from 'moment';
+import express from 'express';
+const app = express();
 
 
 /**
@@ -25,7 +27,7 @@ export const getHash = (input) => {
  * @param {*} res - response as sent by server
  * @param {func} next - next function to execute
  */
-const loginCheck = (req, res, next) => {
+export const loginCheck = (req, res, next) => {
   if (!req.cookies.loggedInHash) {
     res.redirect('/login', { message: 'Please log in to continue.' });
   }

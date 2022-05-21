@@ -2,44 +2,43 @@
 <html>
   <%- include('partials/head'); -%> <%- include('partials/navbar-nologin');
   -%><br />
-  <%- if (message === true) {%>
-  <h3 class="sans-bold">Wrong Email or Password. Please try again.</h3>
-  <%- } %>
-  <div class="container">
-    <div
-      class="col-12 d-flex align-items-center justify-content-center flex-column text-white"
-    >
-      <h1 class="text-dark">Log In!</h1>
-      <br />
-      <div class="bg-secondary p-3 rounded">
-        <form action="/login" method="POST">
-          <label for="email">Email:</label><br />
-          <input
-            type="text"
-            id="email"
-            name="email"
-            class="form-control"
-            size="40"
-            required
-          /><br />
-          <label for="password">Password:</label><br />
-          <input
-            type="password"
-            id="password"
-            name="password"
-            class="form-control"
-            size="40"
-            required
-          /><br />
-          <div class="text-center">
+  <body class="bg-color">
+    <div class="container">
+      <div
+        class="col-12 d-flex align-items-center justify-content-center flex-column text-dark"
+      >
+        <br />
+        <div class="bg-white p-3 rounded">
+          <h3 class="text-dark text-center sans-bold">Log In!</h1>
+          <form action="/login" method="POST">
+            <label for="email">Email:</label><br />
             <input
-              class="btn btn-primary btn-lg"
-              type="submit"
-              value="Submit"
-            />
-          </div>
-        </form>
+              type="text"
+              id="email"
+              name="email"
+              class="form-control"
+              size="50"
+              required
+            /><br />
+            <label for="password">Password:</label><br />
+            <input
+              type="password"
+              id="password"
+              name="password"
+              class="form-control"
+              size="50"
+              required
+            /><br />
+            <div class="text-center">
+              <input
+                class="btn btn-primary btn-lg rounded-0"
+                type="submit"
+                value="Submit"
+              />
+            </div>
+          </form>
+        </div>
       </div>
     </div>
-  </div>
+  </body>
 </html>

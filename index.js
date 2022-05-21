@@ -5,7 +5,7 @@ import cookieParser from 'cookie-parser';
 import moment from 'moment';
 const SALT = 'Milk is delicious';
  
-import { getHash , getDateLabel, getExpenseDate, } from './helper.js'
+import { getHash , getDateLabel, getExpenseDate,loginCheck } from './helper.js'
 
 const app = express();
 
@@ -29,27 +29,27 @@ const pgConnectionConfigs = {
 const pool = new Pool(pgConnectionConfigs);
 
 
-/**
- * checks and sets login status to restrict certain routes to unly be usable by logged-in users
- * compares the existing hash cookie to a resh hash of the raw userId cookie to verify that no changes were made by the user
- * @param {*} req - request as sent by client
- * @param {*} res - response as sent by server
- * @param {func} next - next function to execute
- */
-const loginCheck = (req, res, next) => {
-  if (!req.cookies.loggedInHash) {
-    res.redirect('/login', { message: 'Please log in to continue.' });
-  }
-  // set the default value
-  req.isUserLoggedIn = false;
+// /**
+//  * checks and sets login status to restrict certain routes to unly be usable by logged-in users
+//  * compares the existing hash cookie to a resh hash of the raw userId cookie to verify that no changes were made by the user
+//  * @param {*} req - request as sent by client
+//  * @param {*} res - response as sent by server
+//  * @param {func} next - next function to execute
+//  */
+// const loginCheck = (req, res, next) => {
+//   if (!req.cookies.loggedInHash) {
+//     res.redirect('/login', { message: 'Please log in to continue.' });
+//   }
+//   // set the default value
+//   req.isUserLoggedIn = false;
 
-  // check to see if the cookies you need exists
-  if (req.cookies.userID) {
-      req.isUserLoggedIn = true;
-      app.locals.userID = req.cookies.userID;
-    }
-  next();
-};
+//   // check to see if the cookies you need exists
+//   if (req.cookies.userID) {
+//       req.isUserLoggedIn = true;
+//       app.locals.userID = req.cookies.userID;
+//     }
+//   next();
+// };
 
 app.get('/', (request, response) => {
   response.render('index');
@@ -110,7 +110,7 @@ app.post('/login', (req, res) => {
   })
   .catch((error) => {
     console.log('Error executing query', error.stack);
-    res.render('error', { message: 'Wrong Email or Password. Please try again.'});
+    res.render('login', { message: true});
     return
   })
 });
@@ -315,15 +315,12 @@ app.get('/dashboard/:groupid',loginCheck, (req, res) => {
     }
 
     const expensebyDayResult = async (querydateArray) => {
-      const dailyexpense = [];
       const results = await Promise.all(querydateArray.map(async (querydateArray) => getExpensebyDay(querydateArray)))
       for (let i=0; i<querydateArray.length; i+=1){
       let dailysum=0;
-      // console.log(dailysum)
       if (!results[i].rows.length){
         data['expense'].push(Number(0));
       } else {
-      // console.log(results[i]['rows'])
        results[i]['rows'].forEach(element =>{
          dailysum += (Number(element.amount))
          console.log(dailysum)
@@ -362,17 +359,17 @@ app.get('/dashboard/:groupid/new-expense/',loginCheck, (req, res) => {
   })
 })
 
-
 // create a new expense inside a group - post route
 app.post('/dashboard/:groupid/new-expense/',loginCheck, (req, res) => {
   const { groupid } = req.params;
-  const { userID } = app.locals.userID;
+  const { userID } = req.cookies
   console.log(userID)
+  const createddate = new Date();
   const { name, date, amount, note} = req.body;
 
-  const insertExpenseQuery = 'INSERT INTO expense (name, user_id, note, group_id, date, amount) VALUES ($1, $2, $3, $4, $5, $6)';
+  const insertExpenseQuery = 'INSERT INTO expense (name, user_id, note, group_id, date, amount,created_at) VALUES ($1, $2, $3, $4, $5, $6, $7)';
 
-  const getExpenseValue = [name, userID, note, groupid, date, amount]
+  const getExpenseValue = [name, userID, note, groupid, date, amount, createddate]
   console.log(getExpenseValue)
   pool.query(insertExpenseQuery,getExpenseValue);
   res.redirect(`/dashboard/${groupid}`)

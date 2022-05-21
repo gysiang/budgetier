@@ -11,15 +11,36 @@
       />
       <small><strong>Budgetier</strong></small>
     </a>
-    <ul class="nav navbar-nav navbar-right flex-row justify-content-around">
-      <li class="nav-item"></li>
-      <li class="nav-item mt-2 pl-5">
-        <form id="logout" action="/logout?_method=DELETE" method="POST">
-          <label>
-            <input class="btn btn-danger" type="submit" value="Log Out" />
-          </label>
-        </form>
+    <ul class="nav navbar-nav navbar-right flex-row justify-content-end">
+      <li class="nav-item">
+      <a
+          data-toggle="modal" data-target="#logoutModal" 
+          class="btn btn-danger ml-2 rounded-0">Log Out</a>
       </li>
     </ul>
   </div>
 </nav>
+
+<!-- Modal -->
+<div class="modal fade" id="logoutModal" tabindex="-1" aria-labelledby="logoutModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">Warning</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        Do You Really Want to Log Out?
+      </div>
+      <div class="modal-footer d-inline-flex flex-row align-items-start">
+        <button type="button" class="btn btn-secondary px-4 rounded-0" data-dismiss="modal">Close</button>
+        <form id="logout" action="/logout?_method=DELETE" method="POST">
+          <label>
+            <input class="btn btn-danger rounded-0 px-3" type="submit" value="Log Out" />
+          </label>
+      </div>
+    </div>
+  </div>
+</div>
