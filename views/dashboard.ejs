@@ -40,15 +40,35 @@
             class="btn btn-primary mr-1 rounded-0"
             >Edit Vacation</a
           >
-          <form
-            id="submitButton"
-            action="/dashboard/<%= groupInfo[i].id %>/delete?_method=DELETE"
-            method="POST"
-          >
-            <label>
-              <input class="btn btn-danger rounded-0" type="submit" value="Delete" />
-            </label>
-          </form>
+          <a
+          data-toggle="modal" data-target="#deleteGroup<%= groupInfo[i].id %>" 
+          class="btn btn-danger rounded-0">Delete</a>
+          <!-- Modal -->
+          <div class="modal fade" id="deleteGroup<%= groupInfo[i].id %>" tabindex="-1" aria-labelledby="deleteGroupLabel" aria-hidden="true">
+          <div class="modal-dialog modal-dialog-centered" role="document">
+          <div class="modal-content">
+          <div class="modal-header">
+          <h5 class="modal-title" id="exampleModalLabel">Warning</h5>
+          
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        Do You Want to delete this Vacation?<br/>
+        All Information from this vacation will be gone!
+      </div>
+      <div class="modal-footer d-inline-flex flex-row align-items-start">
+        <button type="button" class="btn btn-secondary px-4 rounded-0" data-dismiss="modal">Close</button>
+        <form id="deletegroup" action="/dashboard/<%= groupInfo[i].id %>/delete?_method=DELETE" method="POST">
+          <label>
+            <input class="btn btn-danger rounded-0 px-3" type="submit" value="Delete" />
+          </label>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- End of Modal -->
         </div>
       </div>
       <div class="card-footer text-dark">
@@ -58,6 +78,7 @@
       <% }%>
   </div>
 <br/>
+
 <%- include('partials/dashboard-footer'); -%> 
 </body>
 </html>
