@@ -7,11 +7,11 @@
         class="col-12 my-5 d-flex align-items-center justify-content-center flex-column"
       >
         <div class="bg-white p-3 rounded">
-          <h3 class="text-dark text-center">
+          <h5 class="text-dark text-center">
             Add A New Expense for <%= groupInfo[0].name %><br />
             <%= moment(groupInfo[0].vacation_date).format("DD MMM YY") %>, <%=
             groupInfo[0].days_of_vacation %> Days
-          </h3>
+          </h5>
           <br />
           <form action="/dashboard/<%=groupid%>/new-expense/" method="POST">
             <label for="name">Name :</label>

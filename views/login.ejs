@@ -3,7 +3,7 @@
   <%- include('partials/head'); -%> <%- include('partials/navbar-nologin');
   -%>
   <% if (locals.messages) { %>
-    <div class="alert alert-danger text-dark text-center"><%= (messages.msg) %>
+    <div class="alert alert-danger text-center" role="alert"><%= (messages.msg) %>
     </div>
 <% } %>
   <body class="bg-color">

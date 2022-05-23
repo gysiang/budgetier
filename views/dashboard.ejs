@@ -1,11 +1,15 @@
 <!DOCTYPE html>
 <html>
-  <%- include('partials/head'); -%>
-
+<%- include('partials/head'); -%>
 <body class="bg-color">
-  <%- include('partials/navbar'); -%><br />
+  <%- include('partials/navbar'); -%>
+   <% if (message) { %>
+    <div class="alert alert-success text-center" role="alert"><%= (message) %>
+    </div>
+<% } %>
   <div class="container">
-    <div class="col-4">
+    <div class="col-5">
+      <br/>
       <p class="name text-dark sans-bold">Hello <%= userData.name %>!</p>
     </div>
     </div>
@@ -24,7 +28,7 @@
     <!-- show a list of groups that user is in -->
     <% for (let i=0; i< groupInfo.length; i++) { %>
     <br />
-    <div class="card text-center rounded-lg bg-light border-dark border-2 shadow">
+    <div class="card text-center rounded-lg bg-white border-dark border-2 shadow">
       <div class="card-body">
         <h5 class="card-title text-dark sans-bold"><%= groupInfo[i].name %></h5>
         <p class="card-text text-dark sans-reg">

@@ -1,7 +1,10 @@
 <!DOCTYPE html>
 <html>
   <%- include('partials/head'); -%> <%- include('partials/navbar'); -%>
-
+<% if (message) { %>
+    <div class="alert alert-success  text-center" role="alert"><%= (message) %>
+    </div>
+<% } %>
 <body class="bg-color">
   <div class="container">
     <div class="col-sm-12">
@@ -69,7 +72,20 @@
           </tr>
         </tbody>
       </table>
+<% let totalamt = 0;%>
+<% groupData.forEach((expense, i)  => { %>
+<% totalamt += Number(groupData[i].amount) %> 
+<% }) %>
+
+<div class="col-12 text-dark bg-white rounded text-center p-2 sans-bold border border-dark">
+Amount Spent: $<%= totalamt %>/$<%= groupInfo.budget %>
+<div class="progress">
+  <div class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar" aria-valuenow="<%= totalamt %>" aria-valuemin="0" aria-valuemax="<%= Number(groupInfo.budget) %>" style="width: <%= (totalamt/groupInfo.budget *100) %>%">
+    </div>
   </div>
+</div>
+
+
   <%- include('partials/group-footer'); -%> 
 </body>
 </html>

@@ -22,8 +22,8 @@ app.use(cookieParser());
 app.use(session({
   secret: 'secret',
   cookie: {maxAge: 60000},
-  resave: false,
-  saveUninitialized:false
+  resave: true,
+  saveUninitialized:true
 }));
 app.use(flash());
 
@@ -48,7 +48,9 @@ const pool = new Pool(pgConnectionConfigs);
  */
 const loginCheck = (req, res, next) => {
   if (!req.cookies.loggedInHash) {
-    res.redirect('/login', { message: 'Please log in to continue.' });
+    req.flash("msg","Please login again!");
+    res.locals.messages = req.flash();
+    res.redirect('/login');
   }
   // set the default value
   req.isUserLoggedIn = false;
@@ -83,7 +85,6 @@ app.post('/signup', (req, res) => {
   pool
     .query(query, signupvalue)
     .then((result) => {
-      res.locals.messages= req.flash('msg','Sign up success!')
       res.redirect('/login')
     })
     .catch((error) => {
@@ -121,7 +122,6 @@ app.post('/login', (req, res) => {
   .catch((error) => {
     req.flash("msg","Wrong Email or Password");
     res.locals.messages = req.flash();
-    console.log(res.locals.messages)
     res.render('login');
     return
   })
@@ -163,6 +163,8 @@ app.put('/user-profile', (req, res) => {
   pool
     .query(updatesqlquery, updateprofilevalue)
     .then((result) => {
+      req.flash("msg","User Profile Successfully Updated!");
+      res.locals.messages = req.flash();
       res.redirect('/dashboard');
     })
     .catch((error) => {
@@ -192,7 +194,8 @@ app.get('/dashboard', loginCheck, (req,res) => {
       userData: userQueryResults.rows[0],
       group: groupQueryResults.rows,
       moment: moment,
-      groupInfo: []
+      groupInfo: [],
+      message: req.session.message
     };
 
     for (let i=0; i<data.group.length; i+=1){
@@ -207,7 +210,6 @@ app.get('/dashboard', loginCheck, (req,res) => {
         let groupQuery = await getGroupData(groupArray[i]);
         data.groupInfo.push(groupQuery.rows[0]);
       }
-      // console.log(data)
       res.render('dashboard', data);
     }
       groupDataResult(groupArray);
@@ -266,7 +268,7 @@ app.get('/dashboard/:groupid/edit',loginCheck, (req, res) => {
 app.put('/dashboard/:groupid/edit',loginCheck, (req, res) => {
   const { groupid } = req.params;
   const { name, date, vacation_days, budget} = req.body;
-
+  console.log(req.body)
   const updategroupquery = 'UPDATE "group" SET name = $1, vacation_date = $2, days_of_vacation = $3, budget = $4 where id = $5';
 
   const updategroupvalues = [name, date, vacation_days,budget,groupid]
@@ -274,6 +276,7 @@ app.put('/dashboard/:groupid/edit',loginCheck, (req, res) => {
   pool
     .query(updategroupquery,updategroupvalues)
     .then((result)=> {
+      req.session.message = "Vacation is successfully updated!";
       res.redirect('/dashboard');
   })
     .catch((error) => {
@@ -293,6 +296,7 @@ app.delete('/dashboard/:groupid/delete',loginCheck, (req, res) => {
   ])
   
     result.then((result)=> {
+      req.session.message = "Vacation had been successfully deleted!";
       res.redirect('/dashboard')
     })
     .catch((error) => {
@@ -310,8 +314,9 @@ app.get('/dashboard/:groupid',loginCheck, (req, res) => {
       groupData: [],
       moment: moment,
       groupid:groupid,
-      expense: []}
-
+      expense: [],
+      message: req.session.message
+  }
   const getExpensebyDay = async (array) => {
       return await pool.query('SELECT amount from expense WHERE date = $1',array)}
 
@@ -350,8 +355,8 @@ app.get('/dashboard/:groupid',loginCheck, (req, res) => {
        .catch((error) => {
         console.log('ERROR CAUGHT');
         console.error(error.message);
-      })
-    })
+  })
+})
 
 app.get('/dashboard/:groupid/new-expense/',loginCheck, (req, res) => {
   const { groupid } = req.params;
@@ -370,26 +375,26 @@ app.get('/dashboard/:groupid/new-expense/',loginCheck, (req, res) => {
     console.log(data)
     res.render('new-expense', data)
   })
+    .catch((error) => {
+    console.log('ERROR CAUGHT');
+    console.error(error.message);
+  })
 })
 
 // create a new expense inside a group - post route
 app.post('/dashboard/:groupid/new-expense/',loginCheck, (req, res) => {
   const { groupid } = req.params;
   const { userID } = req.cookies
-  const createddate = new Date();
+  const  createddate  = new Date();
   const { name, date, amount, note} = req.body;
 
-  const insertExpenseQuery = 'INSERT INTO expense (name, user_id, note, group_id, date, amount,created_at) VALUES ($1, $2, $3, $4, $5, $6, $7)';
+  const insertExpenseQuery = 'INSERT INTO expense (name, user_id, note, group_id, date, amount, created_at) VALUES ($1, $2, $3, $4, $5, $6, $7)';
 
   const getExpenseValue = [name, userID, note, groupid, date, amount, createddate]
   console.log(getExpenseValue)
   pool.query(insertExpenseQuery,getExpenseValue);
-  res.redirect(`/dashboard/${groupid}`)
-
-  .catch((error) => {
-        console.log('INSERT ERROR CAUGHT');
-        console.error(error.message);
-  })
+  req.session.message ="New expense successfully added"
+  res.redirect(`/dashboard/${groupid}`);
 })
 
 // get route to add new users
@@ -432,6 +437,7 @@ app.post('/dashboard/:groupid/add-user/',loginCheck, (req, res) => {
   .then((result)=>{
     const insertValue = [result.rows[0].id,groupid]
     pool.query('INSERT INTO user_group (user_id,group_id) VALUES ($1,$2)',insertValue)
+    req.session.message ="New user successfully added"
     res.redirect(`/dashboard/${groupid}`)
   })
   .catch((error) => {
@@ -475,6 +481,7 @@ app.put('/dashboard/:groupid/:expenseid/edit',loginCheck, (req, res) => {
   pool
     .query(updateSQLQUERY, updateExpenseValues)
     .then(() => {
+      req.session.message="Expense updated successfully!"
       res.redirect(`/dashboard/${groupid}`);
     })  
     .catch((error) => {
@@ -494,6 +501,7 @@ app.delete('/dashboard/:groupid/:expenseid/delete',loginCheck, (req, res) => {
   pool
     .query(deleteSQLQUERY, deleteExpenseValues)
     .then(() => {
+      req.session.message = "Expense deleted successfully!"
       res.redirect(`/dashboard/${groupid}`);
     })  
     .catch((error) => {
