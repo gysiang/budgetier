@@ -1,9 +1,6 @@
 import jsSHA from 'jssha';
 const SALT = 'Milk is delicious';
 import moment from 'moment';
-import express from 'express';
-const app = express();
-
 
 /**
  * hashes an input string according to the salt variable
@@ -21,27 +18,11 @@ export const getHash = (input) => {
 };
 
 /**
- * checks and sets login status to restrict certain routes to unly be usable by logged-in users
- * compares the existing hash cookie to a resh hash of the raw userId cookie to verify that no changes were made by the user
-//  * @param {*} req - request as sent by client
-//  * @param {*} res - response as sent by server
-//  * @param {func} next - next function to execute
-//  */
-export const loginCheck = (req, res, next) => {
-  if (!req.cookies.loggedInHash) {
-    res.redirect('/login', { message: 'Please log in to continue.' });
-  }
-  // set the default value
-  req.isUserLoggedIn = false;
-
-  // check to see if the cookies you need exists
-  if (req.cookies.userID) {
-      req.isUserLoggedIn = true;
-      app.locals.userID = req.cookies.userID;
-    }
-  next();
-};
-
+ * get a array of dates that is used for the chart
+ * @param {date} - date of vacation 
+ * @param {integer} - no of days of vacation
+ * @return {date} - an array of the dates in DD/MM/YY format
+ * */
 export const getDateLabel = (vacation_date, days) => {
 let dateArray = [];
 for (let i=0; i<days; i+=1){
@@ -49,7 +30,13 @@ for (let i=0; i<days; i+=1){
   }
   return dateArray;
 } 
-
+/**
+ * get a array of dates that is used for to query
+ * for the expenses per day
+ * @param {string} - date of vacation 
+ * @return {string} - no of days of vacation
+ * @return {date} - an array of the dates in YYYY-MM-DD format
+ * */
 export const getExpenseDate = (vacation_date, days) => {
 let dateArray = [];
 for (let i=0; i<days; i+=1){

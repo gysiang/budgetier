@@ -1,5 +1,3 @@
-
-
 const TEMPLATE = document.createElement('template');
 TEMPLATE.innerHTML = /* html */ `
 <style>

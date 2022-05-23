@@ -12,14 +12,13 @@
       <br/>
       <p class="name text-dark sans-bold">Hello <%= userData.name %>!</p>
     </div>
-    </div>
     <!-- Only show this image if there are no groups for user. -->
     <% if (group.length <= 0) { %>
     <div class="col-md-12 text-center">
       <h4>Tap New Group to get started</h3>
       <br/>
       <a href="/newgroup">
-      <img style="max-width: 100%" src="/images/holiday.png" class="rounded p-3" alt="holiday-maker" />
+      <img style="max-width: 80%" src="/images/holiday.png" class="rounded-lg p-3" alt="holiday-maker" />
       </a>
     </div>
     <% } %>

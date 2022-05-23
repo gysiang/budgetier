@@ -1,10 +1,19 @@
 # Budgetier
 
+![budgetier logo](./public/images/logo_transparent.png)
+
 A expenses tracking app for the budget conscious travellers.
 
 ## Why I created this app
 
 I will normally set a fixed budget before I travel for vacation. I don't want to mess with my usual daily expenses system and I want to be able to keep my vacation spending within the fixed budget I set before hand. Therefore, this app was born.
+
+#### Features
+
+- Individual accounts for each user
+- Each user can create vacations and can invite others who have signed up to join their vacation
+- Chart that tracks expenses per day
+- See how much you spent in one go on the vacation
 
 #### Libraries Used
 
@@ -18,6 +27,8 @@ I will normally set a fixed budget before I travel for vacation. I don't want to
 - [Moment.js](https://momentjs.com/)
 - [chart.js](https://www.chartjs.org/)
 - [fuse.js](https://fusejs.io/)
+- [express-session](https://www.npmjs.com/package/express-session)
+- [connect-flash](https://www.npmjs.com/package/connect-flash)
 
 #### Other Resources Used
 
@@ -27,16 +38,23 @@ I will normally set a fixed budget before I travel for vacation. I don't want to
 - [Uizard](https://uizard.io/) for Wireframe mockup
 - [Google Material Icons](https://fonts.google.com/icons)
 
-## How to setup and run
-
-### Setup Instructions
+#### Setup Instructions
 
 1. Create a DB in psql with database name `budgetier`
-2. Run npm script to create tables and seed data - `npm run db:create` followed by `npm run db:seed`
-
-### Run and Test
-
+2. Run npm script to create tables - `npm run db:create`
 3. Launch app locally by running `nodemon app.js`
 4. Go to url - `localhost:3004/
 5. Create your own account
 6. Test and navigate app
+
+#### Wireframe
+
+- [Uizard Wireframe](https://app.uizard.io/p/8567cea1) for Wireframe mockup
+
+#### Entity Relationship Diagram (ERD)
+
+![Budgetier ERD](./public/images/Database ER diagram (crow's foot).png)
+
+#### User Flow
+
+![Budgetier User Flow](./public/images/User Flow Chart.png)

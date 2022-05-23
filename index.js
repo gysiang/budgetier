@@ -48,8 +48,7 @@ const pool = new Pool(pgConnectionConfigs);
  */
 const loginCheck = (req, res, next) => {
   if (!req.cookies.loggedInHash) {
-    req.flash("msg","Please login again!");
-    res.locals.messages = req.flash();
+    req.session.message="Please login again!"
     res.redirect('/login');
   }
   // set the default value
@@ -85,6 +84,8 @@ app.post('/signup', (req, res) => {
   pool
     .query(query, signupvalue)
     .then((result) => {
+      req.flash("msg","Signup Success!");
+      res.locals.messages = req.flash(); 
       res.redirect('/login')
     })
     .catch((error) => {
@@ -121,7 +122,7 @@ app.post('/login', (req, res) => {
   })
   .catch((error) => {
     req.flash("msg","Wrong Email or Password");
-    res.locals.messages = req.flash();
+    res.locals.messages = req.flash();    
     res.render('login');
     return
   })
@@ -151,20 +152,19 @@ app.get('/user-profile', (request, response) => {
 });
 
 
-app.put('/user-profile', (req, res) => {
-  console.log(req.body);
+app.put('/user-profile/:userid/edit', (req, res) => {
+  const { userid } = req.params;
   const { name, email,password } = req.body;
-
+  
   const hashedPassword = getHash(password);
 
-  const updatesqlquery = 'UPDATE "user" SET name = $1, password = $2 FROM "user" WHERE "user".email = $3';
+  const updatesqlquery = 'UPDATE "user" SET name = $1, password = $2, email = $3 WHERE id = $4';
 
-  const updateprofilevalue = [name, hashedPassword, email];
+  const updateprofilevalue = [name, hashedPassword, email, userid];
   pool
     .query(updatesqlquery, updateprofilevalue)
     .then((result) => {
-      req.flash("msg","User Profile Successfully Updated!");
-      res.locals.messages = req.flash();
+      req.session.message="User Profile Successfully Updated!"
       res.redirect('/dashboard');
     })
     .catch((error) => {
@@ -420,7 +420,6 @@ app.get('/dashboard/:groupid/add-user/',loginCheck, (req, res) => {
       moment: moment,
       groupid: groupid,
     };
-    console.log(data)
     res.render('add-user', data)
    })
 })
