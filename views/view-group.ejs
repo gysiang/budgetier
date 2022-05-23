@@ -3,12 +3,15 @@
   <%- include('partials/head'); -%> <%- include('partials/navbar'); -%>
 
 <body class="bg-color">
-  <div id ="expenseChart" class="container-md">
+  <div class="container">
+    <div class="col-sm-12">
+    <br />
+    <h2 class="text-dark text-center sans-bold"><%= groupInfo.name %></h2>
+    <p class="text-dark text-center sans-reg"><%= moment(groupInfo.vacation_date).format("DD/MM/YY") %><br><%= groupInfo.days_of_vacation %> Days</p>
+     <div id ="expenseChart">
   <br/>
-
-    <canvas class="bg-white p-2 rounded shadow" id="myChart"></canvas>
+    <canvas class="bg-white p-1 rounded shadow" id="myChart"></canvas>
    </div>
-
    <script>
   let myChart = document.getElementById("myChart");
 
@@ -27,7 +30,7 @@
       },
       options: {
             y: {
-            max: 1000,
+            max: 500,
             ticks: {
                 stepSize: 100
             }
@@ -35,37 +38,34 @@
     }
   });
 </script>
-
-  <div class="container">
-    <div class="col-md-12">
-    <br />
-    <h2 class="text-dark text-center sans-bold"><%= groupInfo[0].group_name %></h2>
-    <br />
+      <br/>
       <table class="table table-sm table-hover table-light">
         <thead class="thead-dark">
           <tr>
-            <th>No.</th>
-            <th>Name</th>
-            <th>Date</th>
-            <th>Amount</th>
-            <th>More</th>
+            <th class="text-center">No.</th>
+            <th class="text-center">Name</th>
+            <th class="text-center">Date</th>
+            <th class="text-center">Amount</th>
+            <th class="text-center">More</th>
           </tr>
           </thead>
           <tbody>
-          <% groupInfo.forEach((expense, i) => { %>
+          <% if (groupData.length > 0) { %>
+          <% groupData.forEach((expense, i) => { %>
           <tr>
-            <td><%= i +1 %></td>
-            <td><%= groupInfo[i].name %></td>
-            <td><%= moment(groupInfo[i].date).format("DD/MM/YY") %></td>
-            <td>$<%= groupInfo[i].amount %></td>
-            <td>
+            <td class="text-center"><%= i +1 %></td>
+            <td class="text-center"><%= groupData[i].name %></td>
+            <td class="text-center"> <%= moment(groupData[i].date).format("DD/MM/YY") %></td>
+            <td class="text-center">$<%= groupData[i].amount %></td>
+            <td class="text-center">
               <a
-                href="/dashboard/<%= groupid %>/<%= groupInfo[i].id %>/edit"
-                class="btn btn-info"
+                href="/dashboard/<%= groupid %>/<%= groupData[i].id %>/edit"
+                class="btn btn-info rounded-0"
                 >Edit</a
               >
             </td>
             <% }) %>
+            <% } %>
           </tr>
         </tbody>
       </table>

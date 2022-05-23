@@ -23,10 +23,10 @@ export const getHash = (input) => {
 /**
  * checks and sets login status to restrict certain routes to unly be usable by logged-in users
  * compares the existing hash cookie to a resh hash of the raw userId cookie to verify that no changes were made by the user
- * @param {*} req - request as sent by client
- * @param {*} res - response as sent by server
- * @param {func} next - next function to execute
- */
+//  * @param {*} req - request as sent by client
+//  * @param {*} res - response as sent by server
+//  * @param {func} next - next function to execute
+//  */
 export const loginCheck = (req, res, next) => {
   if (!req.cookies.loggedInHash) {
     res.redirect('/login', { message: 'Please log in to continue.' });

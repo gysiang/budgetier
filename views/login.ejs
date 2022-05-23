@@ -1,12 +1,17 @@
 <!DOCTYPE html>
 <html>
   <%- include('partials/head'); -%> <%- include('partials/navbar-nologin');
-  -%><br />
+  -%>
+  <% if (locals.messages) { %>
+    <div class="alert alert-danger text-dark text-center"><%= (messages.msg) %>
+    </div>
+<% } %>
   <body class="bg-color">
     <div class="container">
       <div
         class="col-12 d-flex align-items-center justify-content-center flex-column text-dark"
       >
+   
         <br />
         <div class="bg-white p-3 rounded">
           <h3 class="text-dark text-center sans-bold">Log In!</h1>

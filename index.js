@@ -3,9 +3,12 @@ import methodOverride from 'method-override';
 import express from 'express';
 import cookieParser from 'cookie-parser';
 import moment from 'moment';
+import flash from 'connect-flash' 
+import session from 'express-session';
+
 const SALT = 'Milk is delicious';
- 
-import { getHash , getDateLabel, getExpenseDate,loginCheck } from './helper.js'
+
+import { getHash , getDateLabel, getExpenseDate } from './helper.js'
 
 const app = express();
 
@@ -16,6 +19,14 @@ app.use(methodOverride('_method'));
 app.use(express.static('public'));
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
+app.use(session({
+  secret: 'secret',
+  cookie: {maxAge: 60000},
+  resave: false,
+  saveUninitialized:false
+}));
+app.use(flash());
+
 
 // Initialise DB connection
 const { Pool } = pg;
@@ -28,35 +39,34 @@ const pgConnectionConfigs = {
 
 const pool = new Pool(pgConnectionConfigs);
 
+/**
+ * checks and sets login status to restrict certain routes to unly be usable by logged-in users
+ * compares the existing hash cookie to a resh hash of the raw userId cookie to verify that no changes were made by the user
+ * @param {*} req - request as sent by client
+ * @param {*} res - response as sent by server
+ * @param {func} next - next function to execute
+ */
+const loginCheck = (req, res, next) => {
+  if (!req.cookies.loggedInHash) {
+    res.redirect('/login', { message: 'Please log in to continue.' });
+  }
+  // set the default value
+  req.isUserLoggedIn = false;
 
-// /**
-//  * checks and sets login status to restrict certain routes to unly be usable by logged-in users
-//  * compares the existing hash cookie to a resh hash of the raw userId cookie to verify that no changes were made by the user
-//  * @param {*} req - request as sent by client
-//  * @param {*} res - response as sent by server
-//  * @param {func} next - next function to execute
-//  */
-// const loginCheck = (req, res, next) => {
-//   if (!req.cookies.loggedInHash) {
-//     res.redirect('/login', { message: 'Please log in to continue.' });
-//   }
-//   // set the default value
-//   req.isUserLoggedIn = false;
+  // check to see if the cookies you need exists
+  if (req.cookies.userID) {
+      req.isUserLoggedIn = true;
+      app.locals.userID = req.cookies.userID;
+    }
+  next();
+};
 
-//   // check to see if the cookies you need exists
-//   if (req.cookies.userID) {
-//       req.isUserLoggedIn = true;
-//       app.locals.userID = req.cookies.userID;
-//     }
-//   next();
-// };
-
-app.get('/', (request, response) => {
-  response.render('index');
+app.get('/', (req, res) => {
+  res.render('index');
 });
 
-app.get('/signup', (request, response) => {
-  response.render('signup');
+app.get('/signup', (req, res) => {
+  res.render('signup');
 });
 
 app.post('/signup', (req, res) => {
@@ -73,6 +83,7 @@ app.post('/signup', (req, res) => {
   pool
     .query(query, signupvalue)
     .then((result) => {
+      res.locals.messages= req.flash('msg','Sign up success!')
       res.redirect('/login')
     })
     .catch((error) => {
@@ -81,8 +92,8 @@ app.post('/signup', (req, res) => {
   })
 })
 
-app.get('/login', (request, response)=> {
-  response.render('login');
+app.get('/login', (req, res)=> {
+  res.render('login');
 })
 
 app.post('/login', (req, res) => {
@@ -96,12 +107,11 @@ app.post('/login', (req, res) => {
   pool
     .query('SELECT * from "user" WHERE email=$1 AND password=$2', loginValues)
     .then((result) => {
-    console.log(result);
     const user = result.rows[0];
     const unhashedCookieString = `${user.email}-${SALT}`;
 
     if (user.password !== hashedPassword) {
-      res.status(403).send('Invalid Username or Password.');
+      res.redirect('/login')
       return;
     }
       res.cookie('loggedInHash', getHash(unhashedCookieString));
@@ -109,8 +119,10 @@ app.post('/login', (req, res) => {
       res.redirect('/dashboard');
   })
   .catch((error) => {
-    console.log('Error executing query', error.stack);
-    res.render('login', { message: true});
+    req.flash("msg","Wrong Email or Password");
+    res.locals.messages = req.flash();
+    console.log(res.locals.messages)
+    res.render('login');
     return
   })
 });
@@ -210,15 +222,15 @@ app.get('/newgroup', loginCheck, (req, res) => {
   res.render('new-group')
 });
 
-app.post('/newgroup', loginCheck, (req, res) => {
+app.post('/newgroup',loginCheck, (req, res) => {
   const userValue = Number([req.cookies.userID]);
   console.log(req.body)
 
-  const { name, date, vacation_days, budget } = req.body;
+  const { name, date, days, budget } = req.body;
 
   const insertGroupQuery = 'INSERT INTO "group" (name, vacation_date, days_of_vacation, budget) VALUES ($1, $2, $3, $4) RETURNING id';
 
-  const insertGroupValue = [name, date, vacation_days, budget];
+  const insertGroupValue = [name, date, days, budget];
 
   const insertUserGroupQuery = 'INSERT INTO user_group (user_id,group_id) VALUES ($1,$2)';
 
@@ -277,7 +289,7 @@ app.delete('/dashboard/:groupid/delete',loginCheck, (req, res) => {
   const result = Promise.all([
     pool.query(`DELETE FROM "group" WHERE id= $1`,deleteID),
     pool.query('DELETE FROM user_group WHERE group_id = $1',deleteID),
-    pool.query('DELETE FROM expenses WHERE group_id = $1',deleteID)
+    pool.query('DELETE FROM expense WHERE group_id = $1',deleteID)
   ])
   
     result.then((result)=> {
@@ -292,53 +304,54 @@ app.delete('/dashboard/:groupid/delete',loginCheck, (req, res) => {
 app.get('/dashboard/:groupid',loginCheck, (req, res) => {
   const { groupid } = req.params;
 
-  const viewgroupQuery = 'SELECT expense.id,expense.name, "group".name AS group_name, user_id, "group".vacation_date AS group_date,"group".days_of_vacation AS days, date, "group".budget AS group_budget, amount, note from expense INNER JOIN "group" ON group_id = "group".id WHERE group_id= $1';
+  const viewgroupExpense = 'SELECT id,name, user_id, date, amount, note from expense WHERE group_id= $1';
+
+  let data = {
+      groupData: [],
+      moment: moment,
+      groupid:groupid,
+      expense: []}
+
+  const getExpensebyDay = async (array) => {
+      return await pool.query('SELECT amount from expense WHERE date = $1',array)}
+
+  const expensebyDayResult = async (querydateArray) => {
+    const results = await Promise.all(querydateArray.map(async (querydateArray) => getExpensebyDay(querydateArray)))
+    for (let i=0; i<querydateArray.length; i+=1){
+    let dailysum=0;
+    if (!results[i].rows.length){
+      data['expense'].push(Number(0));
+    } else {
+      results[i]['rows'].forEach(element =>{
+      dailysum += (Number(element.amount))
+      }) 
+      data['expense'].push(dailysum);
+    } dailysum=0;}
+      console.log(data)
+      res.render('view-group', data)
+  }
 
   pool
-    .query(viewgroupQuery,[groupid])
+    .query('SELECT * from "group" WHERE id=$1',[groupid])
     .then((result) => {
-      let data = {
-        groupInfo: result.rows,
-        moment: moment,
-        groupid:groupid,
-        label: [],
-        expense: []
-      }
-  
-      const dateLabel = JSON.stringify(getDateLabel(data.groupInfo[0].group_date, data.groupInfo[0].days))
-      data['label'] = dateLabel;
-      const querydateArray = getExpenseDate(data.groupInfo[0].group_date, data.groupInfo[0].days)
-    
-      // console.log(querydateArray)
-      const getExpensebyDay = async (array) => {
-        return await pool.query('SELECT amount from expense WHERE date = $1',array)
-    }
+        data['groupInfo'] = result.rows[0]
 
-    const expensebyDayResult = async (querydateArray) => {
-      const results = await Promise.all(querydateArray.map(async (querydateArray) => getExpensebyDay(querydateArray)))
-      for (let i=0; i<querydateArray.length; i+=1){
-      let dailysum=0;
-      if (!results[i].rows.length){
-        data['expense'].push(Number(0));
-      } else {
-       results[i]['rows'].forEach(element =>{
-         dailysum += (Number(element.amount))
-         console.log(dailysum)
+        const dateLabel = JSON.stringify(getDateLabel(data.groupInfo.vacation_date, data.groupInfo.days_of_vacation))
+        data['label'] = dateLabel;
+
+       const querydateArray = getExpenseDate(data.groupInfo.vacation_date, data.groupInfo.days_of_vacation)
+
+       pool.query(viewgroupExpense,[groupid])
+       .then((viewgroupExpenseResult) => {
+        data['groupData'] = viewgroupExpenseResult.rows
+        expensebyDayResult(querydateArray);
+        })
        })
-      data['expense'].push(dailysum);
-      }
-      dailysum=0;
-    } 
-    console.log(data)
-    res.render('view-group', data)
-  }
-      expensebyDayResult(querydateArray);
-    })
-      .catch((error) => {
+       .catch((error) => {
         console.log('ERROR CAUGHT');
         console.error(error.message);
+      })
     })
-  })
 
 app.get('/dashboard/:groupid/new-expense/',loginCheck, (req, res) => {
   const { groupid } = req.params;
@@ -363,7 +376,6 @@ app.get('/dashboard/:groupid/new-expense/',loginCheck, (req, res) => {
 app.post('/dashboard/:groupid/new-expense/',loginCheck, (req, res) => {
   const { groupid } = req.params;
   const { userID } = req.cookies
-  console.log(userID)
   const createddate = new Date();
   const { name, date, amount, note} = req.body;
 
@@ -471,7 +483,7 @@ app.put('/dashboard/:groupid/:expenseid/edit',loginCheck, (req, res) => {
     })
   });
 
-  // delete individual expense inside a group
+// delete individual expense inside a group
 app.delete('/dashboard/:groupid/:expenseid/delete',loginCheck, (req, res) => {
   const { groupid, expenseid } = req.params;
 

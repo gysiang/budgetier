@@ -49,29 +49,53 @@
               placeholder="$1000.00"
             />
             <br />
-          <div class="d-flex flex-column">
             <input
               type="submit"
               value="Submit"
               class="btn btn-primary text-center btn-lg rounded-0"
             />
           </form>
-          <br/>
-          <form
+          <br/>          
+  
+        <!-- <form
             action="/dashboard/<%= expenseInfo.group_id %>/<%= expenseInfo.id %>/delete?_method=DELETE"
-            method="POST"
-          >
-            <label>
+            method="POST">
               <input
-                class="btn btn-danger text-center btn-xl btn-lg rounded-0"
+                class="btn btn-danger btn-lg rounded-0 btn-block"
                 type="submit"
                 value="Delete"
               />
-            </label>
-          </form>
-          </div>
-          </div>
+          </form> -->
+          <button data-toggle="modal" data-target="#deleteExp<%= expenseInfo.id %>" 
+          class="btn btn-danger btn-lg btn-block rounded-0">Delete</button>
+  <!-- Modal -->
+          <div class="modal fade" id="deleteExp<%= expenseInfo.id %>" tabindex="-1" aria-labelledby="deleteGroupLabel" aria-hidden="true">
+          <div class="modal-dialog modal-dialog-centered" role="document">
+          <div class="modal-content">
+          <div class="modal-header">
+          <h5 class="modal-title" id="exampleModalLabel">Warning</h5>
+          
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
       </div>
+      <div class="modal-body">
+        Do You Really want to delete this Expense?
+      </div>
+      <div class="modal-footer d-inline-flex flex-row align-items-start">
+        <button type="button" class="btn btn-secondary px-4 rounded-0" data-dismiss="modal">Close</button>
+        <form id="deletegroup" action="/dashboard/<%= expenseInfo.group_id %>/<%= expenseInfo.id %>/delete?_method=DELETE" method="POST">
+          <label>
+            <input class="btn btn-danger rounded-0 px-3" type="submit" value="Delete" />
+          </label>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- End of Modal -->      
+    </div>
+  </div>
+ 
   <%- include('partials/dashboard-footer'); -%> 
   </body>
 </html>

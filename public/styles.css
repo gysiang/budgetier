@@ -63,7 +63,8 @@ app-dropdown {
 .border-2 {
   border-width: 3px !important;
 }
-.btn-xl {
-  width: 80vw;
-  height: 50px;
+
+div.scroll {
+  height: 650px;
+  overflow: auto;
 }

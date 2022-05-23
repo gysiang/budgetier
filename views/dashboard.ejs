@@ -1,8 +1,9 @@
 <!DOCTYPE html>
 <html>
-  <%- include('partials/head'); -%> <%- include('partials/navbar'); -%><br />
+  <%- include('partials/head'); -%>
 
 <body class="bg-color">
+  <%- include('partials/navbar'); -%><br />
   <div class="container">
     <div class="col-4">
       <p class="name text-dark sans-bold">Hello <%= userData.name %>!</p>
@@ -12,11 +13,14 @@
     <% if (group.length <= 0) { %>
     <div class="col-md-12 text-center">
       <h4>Tap New Group to get started</h3>
-      <img style="max-width: 100%" src="/images/holiday.png" alt="holiday-maker" />
+      <br/>
+      <a href="/newgroup">
+      <img style="max-width: 100%" src="/images/holiday.png" class="rounded p-3" alt="holiday-maker" />
+      </a>
     </div>
     <% } %>
   </div>
-  <div class="container">
+  <div class="container scroll">
     <!-- show a list of groups that user is in -->
     <% for (let i=0; i< groupInfo.length; i++) { %>
     <br />
@@ -32,17 +36,17 @@
         <div class="d-inline-flex flex-row align-items-start">
           <a
             href="/dashboard/<%= groupInfo[i].id %>"
-            class="btn btn-primary mr-1 rounded-0"
+            class="btn btn-outline-primary mr-1 rounded-0"
             >See More</a
           >
           <a
             href="/dashboard/<%=groupInfo[i].id%>/edit"
-            class="btn btn-primary mr-1 rounded-0"
+            class="btn btn-outline-primary mr-1 rounded-0"
             >Edit Vacation</a
           >
           <a
           data-toggle="modal" data-target="#deleteGroup<%= groupInfo[i].id %>" 
-          class="btn btn-danger rounded-0">Delete</a>
+          class="btn btn-outline-danger rounded-0">Delete</a>
           <!-- Modal -->
           <div class="modal fade" id="deleteGroup<%= groupInfo[i].id %>" tabindex="-1" aria-labelledby="deleteGroupLabel" aria-hidden="true">
           <div class="modal-dialog modal-dialog-centered" role="document">
@@ -76,7 +80,7 @@
       </div>
     </div>
       <% }%>
-  </div>
+    </div>
 <br/>
 
 <%- include('partials/dashboard-footer'); -%> 

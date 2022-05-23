@@ -1,104 +1,109 @@
 <!DOCTYPE html>
 <html>
   <%- include('partials/head'); -%> <%- include('partials/navbar'); -%>
-  <div class="container">
-    <div
-      class="col-12 my-5 d-flex align-items-center justify-content-center flex-column text-white"
-    >
-      <h3 class="text-dark text-center">
-        Add A User for <%= groupInfo[0].name %><br />
-        <%= moment(groupInfo[0].vacation_date).format("DD MMM YY") %>, <%=
-        groupInfo[0].days_of_vacation %> Days
-      </h3>
-      <br />
-      <div class="bg-secondary p-3 rounded">
-        <form action="/dashboard/<%=groupid%>/add-user" method="POST">
-          <label for="email">Search Via Email</label>
-          <input
-            type="text"
-            id="email"
-            name="email"
-            size="50"
-            class="form-control"
-            autofocus
-            required
-          />
-          <input
-            type="submit"
-            value="Submit"
-            class="btn btn-primary text-center btn-lg"
-          />
-        </form>
-      </div>
-      <script type="module" src="/main.mjs"></script>
-      <script type="module">
-        import Fuse from "https://cdn.jsdelivr.net/npm/fuse.js@6.6.2/dist/fuse.esm.js";
+  <body class="bg-color">
+    <div class="container">
+      <div
+        class="col-12 my-5 d-flex align-items-center justify-content-center flex-column"
+      >
+        <br />
+        <div class="bg-white p-3 rounded">
+          <h3 class="text-dark text-center">
+            Add A User for <%= groupInfo[0].name %><br />
+            <%= moment(groupInfo[0].vacation_date).format("DD MMM YY") %>, <%=
+            groupInfo[0].days_of_vacation %> Days
+          </h3>
+          <br />
+          <form action="/dashboard/<%=groupid%>/add-user" method="POST">
+            <label for="email">Search Via Email</label>
+            <input
+              type="text"
+              id="email"
+              name="email"
+              size="50"
+              class="form-control text-dark"
+              autofocus
+              required
+            />
+            <br />
+            <input
+              type="submit"
+              value="Submit"
+              class="btn btn-primary text-center btn-lg"
+            />
+          </form>
+        </div>
+        <script type="module" src="/main.mjs"></script>
+        <script type="module">
+          import Fuse from "https://cdn.jsdelivr.net/npm/fuse.js@6.6.2/dist/fuse.esm.js";
 
-        const FUSE_OPTIONS = {
-        isCaseSensitive: false,
-        includeScore: true,
-        shouldSort: true,
-        threshold: 0.6,
-        };
+          const FUSE_OPTIONS = {
+          isCaseSensitive: false,
+          includeScore: true,
+          shouldSort: true,
+          threshold: 0.6,
+          };
 
-        const fuzzySearch = (list, keys = []) => {
-        const fuse = new Fuse(list, { ...FUSE_OPTIONS, keys });
-        return pattern => fuse.search(pattern);
-        };
+          const fuzzySearch = (list, keys = []) => {
+          const fuse = new Fuse(list, { ...FUSE_OPTIONS, keys });
+          return pattern => fuse.search(pattern);
+          };
 
-        const fuzzySearchBrowsersList = fuzzySearch(<%- JSON.stringify(email)%>, ['email']);
+          const fuzzySearchBrowsersList = fuzzySearch(<%- JSON.stringify(email)%>, ['email']);
 
-        /** @type {HTMLInputElement} */
-        const browserInputElement = document.getElementById('email');
+          /** @type {HTMLInputElement} */
+          const browserInputElement = document.getElementById('email');
 
-        /**
-        * Renders a dropdown list of suggestions for an input element.
-         *
-         * @param {HTMLInputElement} inputEl
-         * @param {Array<string>} suggestions
-         * @returns {void}
-         */
-        const renderInputSuggestions = (inputEl, suggestions) => {
           /**
-           * <app-dropdown
-           *   [id]="BROWSER_SUGGESTIONS_ELEMENT_ID"
-           *   [options]="suggestions"
-           *   [connectedTo]="inputEl">
+          * Renders a dropdown list of suggestions for an input element.
+           *
+           * @param {HTMLInputElement} inputEl
+           * @param {Array<string>} suggestions
+           * @returns {void}
            */
+          const renderInputSuggestions = (inputEl, suggestions) => {
+            /**
+             * <app-dropdown
+             *   [id]="BROWSER_SUGGESTIONS_ELEMENT_ID"
+             *   [options]="suggestions"
+             *   [connectedTo]="inputEl">
+             */
 
-          /** @type {AppDropdownElement} */
-          const existingEl = document.getElementById('email-suggestions');
-          if (existingEl) {
-            existingEl.options = suggestions;
-            existingEl.connectedTo = inputEl;
-            return;
-          }
+            /** @type {AppDropdownElement} */
+            const existingEl = document.getElementById('email-suggestions');
+            if (existingEl) {
+              existingEl.options = suggestions;
+              existingEl.connectedTo = inputEl;
+              return;
+            }
 
-          /** @type {AppDropdownElement} */
-          const createdEl = document.createElement('app-dropdown');
-          createdEl.id = 'email-suggestions';
-          createdEl.options = suggestions;
-          createdEl.connectedTo = inputEl;
+            /** @type {AppDropdownElement} */
+            const createdEl = document.createElement('app-dropdown');
+            createdEl.id = 'email-suggestions';
+            createdEl.options = suggestions;
+            createdEl.connectedTo = inputEl;
 
-          // On click, set the input value to the suggestion
-          createdEl.addEventListener('option-select', () => {
-            console.log('option-select', createdEl.selected);
-            inputEl.value = createdEl.selected;
-            createdEl.remove();
-          });
+            // On click, set the input value to the suggestion
+            createdEl.addEventListener('option-select', () => {
+              console.log('option-select', createdEl.selected);
+              inputEl.value = createdEl.selected;
+              createdEl.remove();
+            });
 
-          document.documentElement.appendChild(createdEl);
-        };
+            document.documentElement.appendChild(createdEl);
+          };
 
-          // Filter the browsers list when the browser input changes
-          browserInputElement.addEventListener('input', () => {
-          const searchKeyword = browserInputElement.value;
-          const filteredList = fuzzySearchBrowsersList(searchKeyword);
-          console.log(filteredList);
-          const cleanFilteredList = filteredList.slice(0, 3).map(el => el.item.email);
-          renderInputSuggestions(browserInputElement, cleanFilteredList);
-          });
-      </script>
+            // Filter the browsers list when the browser input changes
+            browserInputElement.addEventListener('input', () => {
+            const searchKeyword = browserInputElement.value;
+            const filteredList = fuzzySearchBrowsersList(searchKeyword);
+            console.log(filteredList);
+            const cleanFilteredList = filteredList.slice(0, 3).map(el => el.item.email);
+            renderInputSuggestions(browserInputElement, cleanFilteredList);
+            });
+        </script>
+      </div>
     </div>
-  </div>
+  </body>
+  <%- include('partials/group-footer'); -%>
 </html>
