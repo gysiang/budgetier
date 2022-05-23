@@ -4,7 +4,7 @@
 
 A expenses tracking app for the budget conscious travellers.
 
-## Why I created this app
+#### Why I created this app
 
 I will normally set a fixed budget before I travel for vacation. I don't want to mess with my usual daily expenses system and I want to be able to keep my vacation spending within the fixed budget I set before hand. Therefore, this app was born.
 
@@ -53,8 +53,8 @@ I will normally set a fixed budget before I travel for vacation. I don't want to
 
 #### Entity Relationship Diagram (ERD)
 
-![Budgetier ERD](./public/images/Database ER diagram (crow's foot).png)
+![Budgetier ERD](https://raw.githubusercontent.com/gysiang/budgetier/main/public/images/Database ER diagram (crow's foot).png)
 
 #### User Flow
 
-![Budgetier User Flow](./public/images/User Flow Chart.png)
+![Budgetier User Flow](https://raw.githubusercontent.com/gysiang/budgetier/main/public/images/User Flow Chart.png)
