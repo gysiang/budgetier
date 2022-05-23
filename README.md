@@ -53,8 +53,8 @@ I will normally set a fixed budget before I travel for vacation. I don't want to
 
 #### Entity Relationship Diagram (ERD)
 
-![Budgetier ERD](https://raw.githubusercontent.com/gysiang/budgetier/main/public/images/Database ER diagram (crow's foot).png)
+![Budgetier ERD](https://raw.githubusercontent.com/gysiang/budgetier/main/public/images/budgetier_erd.png)
 
 #### User Flow
 
-![Budgetier User Flow](https://raw.githubusercontent.com/gysiang/budgetier/main/public/images/User Flow Chart.png)
+![Budgetier User Flow](https://raw.githubusercontent.com/gysiang/budgetier/main/public/images/budgetier_userflow.png)
