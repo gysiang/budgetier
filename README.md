@@ -4,6 +4,8 @@
 
 A expenses tracking app for the budget conscious travellers.
 
+**DEMO** : [https://youtu.be/uwQAM_rj1d8](https://youtu.be/uwQAM_rj1d8)
+
 #### Why I created this app
 
 I will normally set a fixed budget before I travel for vacation. I don't want to mess with my usual daily expenses system and I want to be able to keep my vacation spending within the fixed budget I set before hand. Therefore, this app was born.

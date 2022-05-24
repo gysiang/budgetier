@@ -57,7 +57,6 @@ const loginCheck = (req, res, next) => {
   // check to see if the cookies you need exists
   if (req.cookies.userID) {
       req.isUserLoggedIn = true;
-      app.locals.userID = req.cookies.userID;
     }
   next();
 };
