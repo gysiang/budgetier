@@ -5,6 +5,7 @@
 A expenses tracking app for the budget conscious travellers.
 
 **DEMO** : [https://youtu.be/uwQAM_rj1d8](https://youtu.be/uwQAM_rj1d8)
+**Heroku** : [https://guarded-hollows-16773.herokuapp.com/](https://guarded-hollows-16773.herokuapp.com/)
 
 #### Why I created this app
 
