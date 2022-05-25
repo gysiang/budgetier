@@ -4,8 +4,9 @@
   "description": "",
   "main": "index.js",
   "scripts": {
+    "start": "node index.js",
     "test": "echo \"Error: no test specified\" && exit 1",
-    "db:create": "psql -d budgetier -f db/init_tables.sql"
+    "db:create": "psql -d budgetier -f init_tables.sql"
   },
   "keywords": [],
   "author": "",

@@ -27,16 +27,25 @@ app.use(session({
 }));
 app.use(flash());
 
-
 // Initialise DB connection
 const { Pool } = pg;
+let pgConnectionConfigs;
+if (process.env.DATABASE_URL) {
+  // pg will take in the entire value and use it to connect
+  pgConnectionConfigs = {
+    connectionString: process.env.DATABASE_URL,
+    ssl: {
+      rejectUnauthorized: false
+    }
+  };
+} else {
 const pgConnectionConfigs = {
   user: 'gysiang',
   host: 'localhost',
   database: 'budgetier',
   port: 5432, // Postgres server always runs on this port by default
-};
-
+  };
+}
 const pool = new Pool(pgConnectionConfigs);
 
 /**
@@ -508,4 +517,4 @@ app.delete('/dashboard/:groupid/:expenseid/delete',loginCheck, (req, res) => {
     })
   });
 
-app.listen(PORT, ()=> console.log(`app is running at PORT ${PORT}...`));
+app.listen(process.env.PORT || PORT, ()=> console.log(`app is running at PORT ${PORT}...`));
